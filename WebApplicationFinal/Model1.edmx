@@ -1,0 +1,482 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="fileModel.Store" Provider="MySql.Data.MySqlClient" ProviderManifestToken="5.7" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="file">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="type" Type="int" />
+          <Property Name="url" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="time" Type="datetime" Precision="0" />
+          <Property Name="download_times" Type="int" />
+          <Property Name="cost" Type="int" />
+          <Property Name="size" Type="double" />
+          <Property Name="name" Type="varchar" MaxLength="45" />
+          <Property Name="permission" Type="int" />
+          <Property Name="status" Type="int" />
+        </EntityType>
+        <EntityType Name="file_request">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="filename" Type="varchar" MaxLength="45" />
+          <Property Name="description" Type="varchar" MaxLength="120" />
+          <Property Name="status" Type="int" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="link_request">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="tg_chat_id" Type="varchar" MaxLength="20" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="school">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="45" />
+          <Property Name="address" Type="varchar" MaxLength="90" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="30" />
+          <Property Name="password" Type="varchar" MaxLength="256" />
+          <Property Name="file_nums" Type="int" />
+          <Property Name="school_id" Type="int" Nullable="false" />
+          <Property Name="tg_chat_id" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="user_has_file">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="file_id" />
+          </Key>
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="file_id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="user_share_file">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="file_id" />
+          </Key>
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="file_id" Type="int" Nullable="false" />
+          <Property Name="code" Type="varchar" MaxLength="45" />
+        </EntityType>
+        <Association Name="fk_file_request_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="file_request" Type="Self.file_request" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="file_request">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_request_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="link_request" Type="Self.link_request" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="link_request">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_user_has_file_file1">
+          <End Role="file" Type="Self.file" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="user_has_file" Type="Self.user_has_file" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="file">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_has_file">
+              <PropertyRef Name="file_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_user_has_file_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="user_has_file" Type="Self.user_has_file" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_has_file">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_user_has_file1_file1">
+          <End Role="file" Type="Self.file" Multiplicity="1" />
+          <End Role="user_share_file" Type="Self.user_share_file" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="file">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_share_file">
+              <PropertyRef Name="file_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_user_has_file1_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="user_share_file" Type="Self.user_share_file" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_share_file">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_user_school">
+          <End Role="school" Type="Self.school" Multiplicity="1" />
+          <End Role="user" Type="Self.user" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="school">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user">
+              <PropertyRef Name="school_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="fileModelStoreContainer">
+          <EntitySet Name="file" EntityType="Self.file" Schema="file" store:Type="Tables" />
+          <EntitySet Name="file_request" EntityType="Self.file_request" Schema="file" store:Type="Tables" />
+          <EntitySet Name="link_request" EntityType="Self.link_request" Schema="file" store:Type="Tables" />
+          <EntitySet Name="school" EntityType="Self.school" Schema="file" store:Type="Tables" />
+          <EntitySet Name="user" EntityType="Self.user" Schema="file" store:Type="Tables" />
+          <EntitySet Name="user_has_file" EntityType="Self.user_has_file" Schema="file" store:Type="Tables" />
+          <EntitySet Name="user_share_file" EntityType="Self.user_share_file" Schema="file" store:Type="Tables" />
+          <AssociationSet Name="fk_file_request_user1" Association="Self.fk_file_request_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="file_request" EntitySet="file_request" />
+          </AssociationSet>
+          <AssociationSet Name="fk_request_user1" Association="Self.fk_request_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="link_request" EntitySet="link_request" />
+          </AssociationSet>
+          <AssociationSet Name="fk_user_has_file_file1" Association="Self.fk_user_has_file_file1">
+            <End Role="file" EntitySet="file" />
+            <End Role="user_has_file" EntitySet="user_has_file" />
+          </AssociationSet>
+          <AssociationSet Name="fk_user_has_file_user1" Association="Self.fk_user_has_file_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="user_has_file" EntitySet="user_has_file" />
+          </AssociationSet>
+          <AssociationSet Name="fk_user_has_file1_file1" Association="Self.fk_user_has_file1_file1">
+            <End Role="file" EntitySet="file" />
+            <End Role="user_share_file" EntitySet="user_share_file" />
+          </AssociationSet>
+          <AssociationSet Name="fk_user_has_file1_user1" Association="Self.fk_user_has_file1_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="user_share_file" EntitySet="user_share_file" />
+          </AssociationSet>
+          <AssociationSet Name="fk_user_school" Association="Self.fk_user_school">
+            <End Role="school" EntitySet="school" />
+            <End Role="user" EntitySet="user" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="fileModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="file">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="type" Type="Int32" />
+          <Property Name="url" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="time" Type="DateTime" />
+          <Property Name="download_times" Type="Int32" />
+          <Property Name="cost" Type="Int32" />
+          <Property Name="size" Type="Double" />
+          <Property Name="name" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="permission" Type="Int32" />
+          <Property Name="status" Type="Int32" />
+          <NavigationProperty Name="user_share_file" Relationship="Self.fk_user_has_file1_file1" FromRole="file" ToRole="user_share_file" />
+          <NavigationProperty Name="user" Relationship="Self.user_has_file" FromRole="file" ToRole="user" />
+        </EntityType>
+        <EntityType Name="file_request">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="filename" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="120" FixedLength="false" Unicode="false" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="user" Relationship="Self.fk_file_request_user1" FromRole="file_request" ToRole="user" />
+        </EntityType>
+        <EntityType Name="link_request">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="tg_chat_id" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="user" Relationship="Self.fk_request_user1" FromRole="link_request" ToRole="user" />
+        </EntityType>
+        <EntityType Name="school">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="address" Type="String" MaxLength="90" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="user" Relationship="Self.fk_user_school" FromRole="school" ToRole="user" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="256" FixedLength="false" Unicode="false" />
+          <Property Name="file_nums" Type="Int32" />
+          <Property Name="school_id" Type="Int32" Nullable="false" />
+          <Property Name="tg_chat_id" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="file_request" Relationship="Self.fk_file_request_user1" FromRole="user" ToRole="file_request" />
+          <NavigationProperty Name="link_request" Relationship="Self.fk_request_user1" FromRole="user" ToRole="link_request" />
+          <NavigationProperty Name="school" Relationship="Self.fk_user_school" FromRole="user" ToRole="school" />
+          <NavigationProperty Name="user_share_file" Relationship="Self.fk_user_has_file1_user1" FromRole="user" ToRole="user_share_file" />
+          <NavigationProperty Name="file" Relationship="Self.user_has_file" FromRole="user" ToRole="file" />
+        </EntityType>
+        <EntityType Name="user_share_file">
+          <Key>
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="file_id" />
+          </Key>
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="file_id" Type="Int32" Nullable="false" />
+          <Property Name="code" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="file" Relationship="Self.fk_user_has_file1_file1" FromRole="user_share_file" ToRole="file" />
+          <NavigationProperty Name="user" Relationship="Self.fk_user_has_file1_user1" FromRole="user_share_file" ToRole="user" />
+        </EntityType>
+        <Association Name="fk_user_has_file1_file1">
+          <End Role="file" Type="Self.file" Multiplicity="1" />
+          <End Role="user_share_file" Type="Self.user_share_file" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="file">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_share_file">
+              <PropertyRef Name="file_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_file_request_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="file_request" Type="Self.file_request" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="file_request">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_request_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="link_request" Type="Self.link_request" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="link_request">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_user_school">
+          <End Role="school" Type="Self.school" Multiplicity="1" />
+          <End Role="user" Type="Self.user" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="school">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user">
+              <PropertyRef Name="school_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_user_has_file1_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="user_share_file" Type="Self.user_share_file" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="user_share_file">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="user_has_file">
+          <End Role="file" Type="Self.file" Multiplicity="*" />
+          <End Role="user" Type="Self.user" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="fileEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="file" EntityType="Self.file" />
+          <EntitySet Name="file_request" EntityType="Self.file_request" />
+          <EntitySet Name="link_request" EntityType="Self.link_request" />
+          <EntitySet Name="school" EntityType="Self.school" />
+          <EntitySet Name="user" EntityType="Self.user" />
+          <EntitySet Name="user_share_file" EntityType="Self.user_share_file" />
+          <AssociationSet Name="fk_user_has_file1_file1" Association="Self.fk_user_has_file1_file1">
+            <End Role="file" EntitySet="file" />
+            <End Role="user_share_file" EntitySet="user_share_file" />
+          </AssociationSet>
+          <AssociationSet Name="fk_file_request_user1" Association="Self.fk_file_request_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="file_request" EntitySet="file_request" />
+          </AssociationSet>
+          <AssociationSet Name="fk_request_user1" Association="Self.fk_request_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="link_request" EntitySet="link_request" />
+          </AssociationSet>
+          <AssociationSet Name="fk_user_school" Association="Self.fk_user_school">
+            <End Role="school" EntitySet="school" />
+            <End Role="user" EntitySet="user" />
+          </AssociationSet>
+          <AssociationSet Name="fk_user_has_file1_user1" Association="Self.fk_user_has_file1_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="user_share_file" EntitySet="user_share_file" />
+          </AssociationSet>
+          <AssociationSet Name="user_has_file" Association="Self.user_has_file">
+            <End Role="file" EntitySet="file" />
+            <End Role="user" EntitySet="user" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="fileModelStoreContainer" CdmEntityContainer="fileEntities">
+          <EntitySetMapping Name="file">
+            <EntityTypeMapping TypeName="fileModel.file">
+              <MappingFragment StoreEntitySet="file">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="url" ColumnName="url" />
+                <ScalarProperty Name="time" ColumnName="time" />
+                <ScalarProperty Name="download_times" ColumnName="download_times" />
+                <ScalarProperty Name="cost" ColumnName="cost" />
+                <ScalarProperty Name="size" ColumnName="size" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="permission" ColumnName="permission" />
+                <ScalarProperty Name="status" ColumnName="status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="file_request">
+            <EntityTypeMapping TypeName="fileModel.file_request">
+              <MappingFragment StoreEntitySet="file_request">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="filename" ColumnName="filename" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="link_request">
+            <EntityTypeMapping TypeName="fileModel.link_request">
+              <MappingFragment StoreEntitySet="link_request">
+                <ScalarProperty Name="tg_chat_id" ColumnName="tg_chat_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="school">
+            <EntityTypeMapping TypeName="fileModel.school">
+              <MappingFragment StoreEntitySet="school">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="address" ColumnName="address" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="user">
+            <EntityTypeMapping TypeName="fileModel.user">
+              <MappingFragment StoreEntitySet="user">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="file_nums" ColumnName="file_nums" />
+                <ScalarProperty Name="school_id" ColumnName="school_id" />
+                <ScalarProperty Name="tg_chat_id" ColumnName="tg_chat_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="user_share_file">
+            <EntityTypeMapping TypeName="fileModel.user_share_file">
+              <MappingFragment StoreEntitySet="user_share_file">
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="file_id" ColumnName="file_id" />
+                <ScalarProperty Name="code" ColumnName="code" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="user_has_file" TypeName="fileModel.user_has_file" StoreEntitySet="user_has_file">
+            <EndProperty Name="file">
+              <ScalarProperty Name="id" ColumnName="file_id" />
+            </EndProperty>
+            <EndProperty Name="user">
+              <ScalarProperty Name="id" ColumnName="user_id" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
