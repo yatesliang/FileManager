@@ -7,24 +7,33 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplicationFinal
+namespace WebApplicationFinal.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class school
+    public partial class file
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public school()
+        public file()
         {
-            this.user = new HashSet<user>();
+            this.user_share_file = new HashSet<user_share_file>();
         }
     
         public int id { get; set; }
+        public Nullable<int> type { get; set; }
+        public string url { get; set; }
+        public Nullable<System.DateTime> time { get; set; }
+        public Nullable<int> download_times { get; set; }
+        public Nullable<int> cost { get; set; }
+        public Nullable<double> size { get; set; }
         public string name { get; set; }
-        public string address { get; set; }
+        public Nullable<int> permission { get; set; }
+        public Nullable<int> status { get; set; }
+        public int user_id { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<user> user { get; set; }
+        public virtual ICollection<user_share_file> user_share_file { get; set; }
+        public virtual user user { get; set; }
     }
 }

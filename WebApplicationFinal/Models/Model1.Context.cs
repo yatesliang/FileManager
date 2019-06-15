@@ -7,16 +7,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplicationFinal
+namespace WebApplicationFinal.Models
 {
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class fileEntities : DbContext
+    public partial class FileEntitiesFinal : DbContext
     {
-        public fileEntities()
-            : base("name=fileEntities")
+        public FileEntitiesFinal()
+            : base("name=FileEntitiesFinal")
         {
         }
     

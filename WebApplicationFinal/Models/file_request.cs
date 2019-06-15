@@ -7,18 +7,19 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplicationFinal
+namespace WebApplicationFinal.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class user_share_file
+    public partial class file_request
     {
+        public int id { get; set; }
+        public string filename { get; set; }
+        public string description { get; set; }
+        public Nullable<int> status { get; set; }
         public int user_id { get; set; }
-        public int file_id { get; set; }
-        public string code { get; set; }
     
-        public virtual file file { get; set; }
         public virtual user user { get; set; }
     }
 }

@@ -7,16 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplicationFinal
+namespace WebApplicationFinal.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class link_request
+    public partial class user_share_file
     {
-        public string tg_chat_id { get; set; }
         public int user_id { get; set; }
+        public int file_id { get; set; }
+        public string code { get; set; }
     
+        public virtual file file { get; set; }
         public virtual user user { get; set; }
     }
 }

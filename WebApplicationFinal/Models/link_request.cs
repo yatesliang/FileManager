@@ -7,17 +7,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplicationFinal
+namespace WebApplicationFinal.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class file_request
+    public partial class link_request
     {
-        public int id { get; set; }
-        public string filename { get; set; }
-        public string description { get; set; }
-        public Nullable<int> status { get; set; }
+        public string tg_chat_id { get; set; }
         public int user_id { get; set; }
     
         public virtual user user { get; set; }

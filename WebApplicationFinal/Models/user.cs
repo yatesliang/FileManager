@@ -7,33 +7,35 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WebApplicationFinal
+namespace WebApplicationFinal.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class file
+    public partial class user
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public file()
+        public user()
         {
+            this.file_request = new HashSet<file_request>();
             this.user_share_file = new HashSet<user_share_file>();
-            this.user = new HashSet<user>();
+            this.file = new HashSet<file>();
         }
-        public int id { get; set; }
-        public Nullable<int> type { get; set; }
-        public string url { get; set; }
-        public Nullable<System.DateTime> time { get; set; }
-        public Nullable<int> download_times { get; set; }
-        public Nullable<int> cost { get; set; }
-        public Nullable<double> size { get; set; }
-        public string name { get; set; }
-        public Nullable<int> permission { get; set; }
-        public Nullable<int> status { get; set; }
     
+        public int id { get; set; }
+        public string name { get; set; }
+        public string password { get; set; }
+        public Nullable<int> file_nums { get; set; }
+        public int school_id { get; set; }
+        public string tg_chat_id { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<file_request> file_request { get; set; }
+        public virtual link_request link_request { get; set; }
+        public virtual school school { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<user_share_file> user_share_file { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<user> user { get; set; }
+        public virtual ICollection<file> file { get; set; }
     }
 }
