@@ -16,14 +16,17 @@ using System.Threading.Tasks;
 using System.Runtime.ConstrainedExecution;
 using FileManager;
 using System.Text;
+using WebApplicationFinal.Util;
 
 
 namespace WebApplicationFinal.Controllers
 {
+    
+    [UserFilter]
     public class FileController : ApiController
     {
         [HttpPost]
-        [Route("uploadFiles")]
+        [Route("file/upload")]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
         public List<String> uploadFile()
         {
@@ -137,7 +140,7 @@ namespace WebApplicationFinal.Controllers
 
         // download file
         [HttpGet]
-        [Route("download")]
+        [Route("file/download")]
         public String downloadFile(int fileId)
         {
             using(FileEntitiesFinal entity = new FileEntitiesFinal())
@@ -156,7 +159,6 @@ namespace WebApplicationFinal.Controllers
 
 
 
-
         [HttpGet]
         [Route("test")]
         public string test()
@@ -166,9 +168,8 @@ namespace WebApplicationFinal.Controllers
         }
 
 
-
         [HttpGet]
-        [Route("addFiles")]
+        [Route("file/uploadTest")]
 
         public user_share_file addFiles()
         {
