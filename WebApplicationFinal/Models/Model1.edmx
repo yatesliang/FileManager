@@ -20,6 +20,7 @@
           <Property Name="permission" Type="int" />
           <Property Name="status" Type="int" />
           <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="description" Type="varchar" MaxLength="300" />
         </EntityType>
         <EntityType Name="file_request">
           <Key>
@@ -194,6 +195,7 @@
           <NavigationProperty Name="user_share_file" Relationship="Self.fk_user_has_file1_file1" FromRole="file" ToRole="user_share_file" />
           <Property Name="user_id" Type="Int32" Nullable="false" />
           <NavigationProperty Name="user" Relationship="fileModel.fk_file_user1" FromRole="file" ToRole="user" />
+          <Property Name="description" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="file_request">
           <Key>
@@ -366,6 +368,7 @@
           <EntitySetMapping Name="file">
             <EntityTypeMapping TypeName="fileModel.file">
               <MappingFragment StoreEntitySet="file">
+                <ScalarProperty Name="description" ColumnName="description" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="type" ColumnName="type" />

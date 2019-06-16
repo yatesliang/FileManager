@@ -15,6 +15,7 @@ using System.Transactions;
 using System.Threading.Tasks;
 using System.Runtime.ConstrainedExecution;
 using FileManager;
+using System.Text;
 
 
 namespace WebApplicationFinal.Controllers
@@ -134,6 +135,27 @@ namespace WebApplicationFinal.Controllers
 
 
 
+        // download file
+        [HttpGet]
+        [Route("download")]
+        public String downloadFile(int fileId)
+        {
+            using(FileEntitiesFinal entity = new FileEntitiesFinal())
+            {
+                file tempFile = entity.file.Where(f => f.id == fileId).FirstOrDefault();
+                if (tempFile == null)
+                {
+                    return "FileNotExist";
+                } else
+                {
+                    return tempFile.url.ToString()+"?attname=";
+                }
+            }
+        }
+
+
+
+
 
         [HttpGet]
         [Route("test")]
@@ -177,6 +199,90 @@ namespace WebApplicationFinal.Controllers
                 return newShare;
             }
 
+        }
+
+
+        [HttpGet]
+        [Route("file/getUserFiles")]
+        public HttpResponseMessage getUserFiles()
+        {
+           // TODO: need to login first
+            var userId = HttpContext.Current.Session["id"];
+            List<file> fileList = null;
+            using (FileEntitiesFinal entity = new FileEntitiesFinal())
+            {
+                fileList = entity.file.Where(f => f.user_id == (int)userId).ToList();
+            }
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, fileList);
+            return response;
+        }
+
+
+
+        [HttpGet]
+        [Route("file/getPublicFiles")]
+        public HttpResponseMessage getPublicFiles()
+        {
+           
+            using (FileEntitiesFinal entity = new FileEntitiesFinal())
+            {
+                var fileList = from f in entity.file where f.permission!=2 select new { f.name, f.id, f.download_times, f.description, f.size };
+
+                List<dynamic> result = new List<dynamic>();
+                foreach (var line in fileList)
+                {
+                    result.Add(line);
+                }
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, result);
+
+                return response;
+
+            }
+        }
+
+        [HttpGet]
+        [Route("file/delete")]
+        public HttpResponseMessage deleteFile(string id)
+        {
+            //string id = HttpContext.Current.Request.Params["fileId"].ToString();
+           
+            int fileId = 0;
+            HttpResponseMessage response = null;
+            
+            response.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue()
+            {
+                MaxAge = TimeSpan.FromMinutes(20)
+            };
+            try
+            {
+                fileId = Convert.ToInt32(id);
+            } catch (Exception e)
+            {
+                response = Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid File");
+       
+                return response;
+
+            }
+            using (FileEntitiesFinal entity = new FileEntitiesFinal())
+            {
+                var files = from f in entity.file where f.id == fileId select f;
+                file tempFile = files.FirstOrDefault();
+                if (tempFile.status == 100)
+                {
+                    response.StatusCode = HttpStatusCode.Forbidden;
+                    response = Request.CreateResponse(HttpStatusCode.BadRequest, "File had been deleted, don't delete it again.");
+                    return response;
+                }
+                tempFile.status = 100;
+                entity.Entry<file>(tempFile).State = System.Data.Entity.EntityState.Modified;
+                entity.SaveChanges();
+                response.StatusCode = HttpStatusCode.OK;
+                string message = string.Format("Delete file {0} successfully!", tempFile.name.ToString());
+                //response.Content = new StringContent(message, Encoding.Unicode);
+                response = Request.CreateResponse(HttpStatusCode.OK, message);
+                return response;
+
+            }
         }
     }
 }

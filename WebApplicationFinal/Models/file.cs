@@ -31,6 +31,7 @@ namespace WebApplicationFinal.Models
         public Nullable<int> permission { get; set; }
         public Nullable<int> status { get; set; }
         public int user_id { get; set; }
+        public string description { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<user_share_file> user_share_file { get; set; }
