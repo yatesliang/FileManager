@@ -14,13 +14,21 @@ using System.Web.SessionState;
 using WebApplicationFinal.Util;
 using System.Threading.Tasks;
 using System.Transactions;
-
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace WebApplicationFinal.Controllers
 {
+
+
+    // 互操作
+    
+
     [UserFilter]
     public class UserController : ApiController
     {
+        [DllImport(@"C:\Users\wrl\Desktop\NET\DLL\Encrypt.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int getEncodeString(string s, ref byte result);
 
         FileEntitiesFinal db = new FileEntitiesFinal();
         public static MySqlConnection CreateConn()
@@ -79,6 +87,7 @@ namespace WebApplicationFinal.Controllers
         }
 
         [NoLogin]
+        [Route("user/register")]
         [HttpPost]
         [HttpGet]
         public HttpResponseMessage register(int id, int schoolId, string password, string name) 
@@ -93,6 +102,28 @@ namespace WebApplicationFinal.Controllers
                 Request.CreateResponse(HttpStatusCode.BadRequest, "User Already Exist");
             }
             //TODO: Encrypt the password here
+            byte[] psw = new byte[256];
+            if(getEncodeString(password, ref psw[0]) == -1)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError
+                    , "System Error");
+            }
+            StringBuilder encodedPsw = new StringBuilder();
+            for (int i = 0; i < psw.Length; ++i)
+            {
+                if (psw[i] != 0)
+                {
+                    encodedPsw.Append((char)psw[i]);
+                }
+                else
+                {
+                    break;
+                }
+                //encodedPsw.Append((char)psw[i]);
+            }
+            password = encodedPsw.ToString();
+
+
             user newUser = new user()
             {
                 id = id,
