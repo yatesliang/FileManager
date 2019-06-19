@@ -72,7 +72,27 @@ namespace WebApplicationFinal.Controllers
                     return Request.CreateResponse(HttpStatusCode.BadRequest, "User is not registered");
                 } else
                 {
-                    //TODO: Here should encrypt the password and compare!
+                    //Here should encrypt the password and compare!
+                    byte[] psw = new byte[256];
+                    if (getEncodeString(password, ref psw[0]) == -1)
+                    {
+                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError
+                            , "System Error");
+                    }
+                    StringBuilder encodedPsw = new StringBuilder();
+                    for (int i = 0; i < psw.Length; ++i)
+                    {
+                        if (psw[i] != 0)
+                        {
+                            encodedPsw.Append((char)psw[i]);
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                    }
+                    password = encodedPsw.ToString();
                     if (password.Equals(currentUser.password))
                     {
                         HttpContext.Current.Session["id"] = currentUser.id;

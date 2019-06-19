@@ -17,6 +17,7 @@ using System.Runtime.ConstrainedExecution;
 using FileManager;
 using System.Text;
 using WebApplicationFinal.Util;
+using System.Runtime.InteropServices;
 
 
 namespace WebApplicationFinal.Controllers
@@ -25,6 +26,13 @@ namespace WebApplicationFinal.Controllers
     [UserFilter]
     public class FileController : ApiController
     {
+
+        [DllImport(@"C:\Users\wrl\Desktop\NET\DLL\FileCheck.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int checkName(string name, ref byte info);
+        [DllImport(@"C:\Users\wrl\Desktop\NET\DLL\FileCheck.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int getFileType(string name);
+
+
         [HttpPost]
         [Route("file/upload")]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -38,9 +46,28 @@ namespace WebApplicationFinal.Controllers
                 HttpPostedFile file = files[key];
                 if (string.IsNullOrEmpty(file.FileName) == false)
                 {
+
+                    // check file name here
+                    byte[] info = new byte[1024];
+                    if (checkName(file.FileName, ref info[0]) == -1)
+                    {
+                        filelist.Add("File \'" + file.FileName + "\' name is not valid");
+                        continue;
+                    }
                     //  get the file parameter here
                     var request = HttpContext.Current.Request;
-                    var type = request.QueryString["type"];
+                    string type = "";
+                    try
+                    {
+                        type = request.QueryString["type"];
+
+                    }
+                    catch(Exception e)
+                    {
+                        type = getFileType(file.FileName).ToString();
+                    }
+
+
                     var permission = request.QueryString["permission"];
                     DateTime time = DateTime.Now;
                     // change the file to the byte array
@@ -50,13 +77,14 @@ namespace WebApplicationFinal.Controllers
                         data = binaryReader.ReadBytes((int)file.InputStream.Length);
                     }
                     
-                    // TODO: read the user id from the session
+                    //read the user id from the session
                     var userId = HttpContext.Current.Session["id"];
                     // add a filter to block the unlogin user
-                    if (userId == null)
-                    {
-                        userId = 2;
-                    }
+                    // here is for test
+                    //if (userId == null)
+                    //{
+                    //    userId = 2;
+                    //}
                     String fileName = file.FileName;
 
                     // check whether the file name already exist, if yes, replace a name automatically
@@ -69,6 +97,7 @@ namespace WebApplicationFinal.Controllers
                     String url = fileManager.uploadByteFile(data, fileName);
                     if (url == "upload failed")
                     {
+                        filelist.Add("File \'" + file.FileName + "\' upload fail");
                         continue;
                     }
 
@@ -89,13 +118,13 @@ namespace WebApplicationFinal.Controllers
                     // TODO： call the function to finished
                     Task task = StoreFileToDB(newFile);
                     task.Wait();
-                    filelist.Add(file.FileName);
+                    filelist.Add("File \'"+file.FileName+"\' upload success");
                 }
             }
             var len = filelist.Count;
             if (len < 1)
             {
-                filelist.Add("Empty");
+                filelist.Add(" ");
             }
             return filelist;
         }
@@ -155,6 +184,18 @@ namespace WebApplicationFinal.Controllers
                 }
             }
         }
+
+
+
+        [HttpGet]
+        [HttpPost]
+        [NoLogin]
+        [Route("file/fastDownload")]
+        public HttpResponseMessage downloadByCode()
+        {
+            return null;
+        }
+
 
 
 
