@@ -14,12 +14,21 @@ namespace WebApplicationFinal.Models
     
     public partial class file_request
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public file_request()
+        {
+            this.answer = new HashSet<answer>();
+        }
+    
         public int id { get; set; }
-        public string filename { get; set; }
+        public string title { get; set; }
         public string description { get; set; }
         public Nullable<int> status { get; set; }
         public int user_id { get; set; }
+        public Nullable<System.DateTime> post_time { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<answer> answer { get; set; }
         public virtual user user { get; set; }
     }
 }

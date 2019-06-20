@@ -6,18 +6,21 @@
     <edmx:Diagrams>
       <Diagram DiagramId="a136a771871e48a184099a48b44fec01" Name="Diagram1">
         <EntityTypeShape EntityType="fileModel.file" Width="1.5" PointX="6" PointY="9.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="fileModel.file_request" Width="1.5" PointX="5.25" PointY="2.5" IsExpanded="true" />
         <EntityTypeShape EntityType="fileModel.link_request" Width="1.5" PointX="5.25" PointY="5.375" IsExpanded="true" />
         <EntityTypeShape EntityType="fileModel.school" Width="1.5" PointX="0.75" PointY="3.875" IsExpanded="true" />
         <EntityTypeShape EntityType="fileModel.user" Width="1.5" PointX="3" PointY="3.25" IsExpanded="true" />
         <EntityTypeShape EntityType="fileModel.user_share_file" Width="1.5" PointX="8.25" PointY="3.75" IsExpanded="true" />
         <AssociationConnector Association="fileModel.fk_user_has_file1_file1" ManuallyRouted="false" />
-        <AssociationConnector Association="fileModel.fk_file_request_user1" ManuallyRouted="false" />
         <AssociationConnector Association="fileModel.fk_request_user1" ManuallyRouted="false" />
         <AssociationConnector Association="fileModel.fk_user_school" ManuallyRouted="false" />
         <AssociationConnector Association="fileModel.fk_user_has_file1_user1" ManuallyRouted="false" />
         <AssociationConnector Association="fileModel.fk_file_user1" />
-      </Diagram>
+        <EntityTypeShape EntityType="fileModel.answer" Width="1.5" PointX="7.5" PointY="0.75" />
+        <EntityTypeShape EntityType="fileModel.file_request" Width="1.5" PointX="5.25" PointY="2.5" />
+        <AssociationConnector Association="fileModel.fk_answer_file_request1" />
+        <AssociationConnector Association="fileModel.fk_answer_user1" />
+        <AssociationConnector Association="fileModel.fk_file_request_user1" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

@@ -62,22 +62,21 @@ namespace WebApplicationFinal.Controllers
         [HttpPost]
         [HttpGet]
         [Route("user/login")]
-        public HttpResponseMessage login(int id, String password)
+        public int login(int id, String password)
         {
             using (FileEntitiesFinal entity = new FileEntitiesFinal())
             {
                 user currentUser = entity.user.Where(f => f.id == id).FirstOrDefault();
                 if (currentUser == null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, "User is not registered");
+                    return 1;
                 } else
                 {
                     //Here should encrypt the password and compare!
                     byte[] psw = new byte[256];
                     if (getEncodeString(password, ref psw[0]) == -1)
                     {
-                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError
-                            , "System Error");
+                        return 2;
                     }
                     StringBuilder encodedPsw = new StringBuilder();
                     for (int i = 0; i < psw.Length; ++i)
@@ -95,15 +94,40 @@ namespace WebApplicationFinal.Controllers
                     password = encodedPsw.ToString();
                     if (password.Equals(currentUser.password))
                     {
+                        HttpCookie cookie = new HttpCookie("user_cookie")
+                        {
+                            Value = currentUser.id.ToString(),
+                            Expires = DateTime.Now.AddHours(1)
+                        };
+                        HttpContext.Current.Response.Cookies.Add(cookie);
                         HttpContext.Current.Session["id"] = currentUser.id;
-                        return Request.CreateResponse(HttpStatusCode.OK, "Login successfully");
+                       
+                        return 3;
                     } else
                     {
-                        return Request.CreateResponse(HttpStatusCode.BadRequest, "User ID or password incorrect");
+                        return 4;
                     }
                 }
                 
             }
+        }
+
+
+        [HttpGet]
+        [HttpPost]
+        [Route("user/logout")]
+        public HttpResponseMessage logout()
+        {
+            try
+            {
+                HttpContext.Current.Session["id"] = null;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Internel error");
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, "Sign out successfully");
+
         }
 
         [NoLogin]
@@ -119,7 +143,7 @@ namespace WebApplicationFinal.Controllers
             // check the exist user here
             if (isUserExist(id))
             {
-                Request.CreateResponse(HttpStatusCode.BadRequest, "User Already Exist");
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "User Already Exist");
             }
             //TODO: Encrypt the password here
             byte[] psw = new byte[256];

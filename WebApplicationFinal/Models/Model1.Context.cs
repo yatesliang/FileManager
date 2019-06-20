@@ -26,10 +26,11 @@ namespace WebApplicationFinal.Models
         }
     
         public virtual DbSet<file> file { get; set; }
-        public virtual DbSet<file_request> file_request { get; set; }
         public virtual DbSet<link_request> link_request { get; set; }
         public virtual DbSet<school> school { get; set; }
         public virtual DbSet<user> user { get; set; }
         public virtual DbSet<user_share_file> user_share_file { get; set; }
+        public virtual DbSet<answer> answer { get; set; }
+        public virtual DbSet<file_request> file_request { get; set; }
     }
 }

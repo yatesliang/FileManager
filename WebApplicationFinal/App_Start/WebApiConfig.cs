@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace WebApplicationFinal
 {
@@ -14,7 +15,11 @@ namespace WebApplicationFinal
 
             // Web API 路由
             config.MapHttpAttributeRoutes();
-            config.EnableCors();
+            config.EnableCors(new EnableCorsAttribute(origins: "http://localhost:63342", headers: "*", methods: "*") { SupportsCredentials = true });
+
+
+
+
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{action}/{id}",

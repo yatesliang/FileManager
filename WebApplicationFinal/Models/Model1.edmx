@@ -5,13 +5,25 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="fileModel.Store" Provider="MySql.Data.MySqlClient" ProviderManifestToken="5.7" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="answer">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="file_request_id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="content" Type="varchar" MaxLength="150" />
+          <Property Name="answer_time" Type="datetime" Precision="0" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="file_request_id" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="file">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="type" Type="int" />
-          <Property Name="url" Type="varchar" MaxLength="128" Nullable="false" />
+          <Property Name="url" Type="varchar" MaxLength="512" />
           <Property Name="time" Type="datetime" Precision="0" />
           <Property Name="download_times" Type="int" />
           <Property Name="cost" Type="int" />
@@ -25,13 +37,13 @@
         <EntityType Name="file_request">
           <Key>
             <PropertyRef Name="id" />
-            <PropertyRef Name="user_id" />
           </Key>
-          <Property Name="id" Type="int" Nullable="false" />
-          <Property Name="filename" Type="varchar" MaxLength="45" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="title" Type="varchar" MaxLength="45" />
           <Property Name="description" Type="varchar" MaxLength="120" />
           <Property Name="status" Type="int" />
           <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="post_time" Type="datetime" Precision="0" />
         </EntityType>
         <EntityType Name="link_request">
           <Key>
@@ -68,6 +80,34 @@
           <Property Name="file_id" Type="int" Nullable="false" />
           <Property Name="code" Type="varchar" MaxLength="45" />
         </EntityType>
+        <Association Name="fk_answer_file_request1">
+          <End Role="file_request" Type="Self.file_request" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="answer" Type="Self.answer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="file_request">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="answer">
+              <PropertyRef Name="file_request_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_answer_user1">
+          <End Role="user" Type="Self.user" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="answer" Type="Self.answer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="answer">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="fk_file_request_user1">
           <End Role="user" Type="Self.user" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -143,12 +183,21 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="fileModelStoreContainer">
+          <EntitySet Name="answer" EntityType="Self.answer" Schema="file" store:Type="Tables" />
           <EntitySet Name="file" EntityType="Self.file" Schema="file" store:Type="Tables" />
           <EntitySet Name="file_request" EntityType="Self.file_request" Schema="file" store:Type="Tables" />
           <EntitySet Name="link_request" EntityType="Self.link_request" Schema="file" store:Type="Tables" />
           <EntitySet Name="school" EntityType="Self.school" Schema="file" store:Type="Tables" />
           <EntitySet Name="user" EntityType="Self.user" Schema="file" store:Type="Tables" />
           <EntitySet Name="user_share_file" EntityType="Self.user_share_file" Schema="file" store:Type="Tables" />
+          <AssociationSet Name="fk_answer_file_request1" Association="Self.fk_answer_file_request1">
+            <End Role="file_request" EntitySet="file_request" />
+            <End Role="answer" EntitySet="answer" />
+          </AssociationSet>
+          <AssociationSet Name="fk_answer_user1" Association="Self.fk_answer_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="answer" EntitySet="answer" />
+          </AssociationSet>
           <AssociationSet Name="fk_file_request_user1" Association="Self.fk_file_request_user1">
             <End Role="user" EntitySet="user" />
             <End Role="file_request" EntitySet="file_request" />
@@ -197,18 +246,6 @@
           <NavigationProperty Name="user" Relationship="fileModel.fk_file_user1" FromRole="file" ToRole="user" />
           <Property Name="description" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="file_request">
-          <Key>
-            <PropertyRef Name="id" />
-            <PropertyRef Name="user_id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
-          <Property Name="filename" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
-          <Property Name="description" Type="String" MaxLength="120" FixedLength="false" Unicode="false" />
-          <Property Name="status" Type="Int32" />
-          <Property Name="user_id" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="user" Relationship="Self.fk_file_request_user1" FromRole="file_request" ToRole="user" />
-        </EntityType>
         <EntityType Name="link_request">
           <Key>
             <PropertyRef Name="user_id" />
@@ -236,11 +273,12 @@
           <Property Name="file_nums" Type="Int32" />
           <Property Name="school_id" Type="Int32" Nullable="false" />
           <Property Name="tg_chat_id" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="file_request" Relationship="Self.fk_file_request_user1" FromRole="user" ToRole="file_request" />
           <NavigationProperty Name="link_request" Relationship="Self.fk_request_user1" FromRole="user" ToRole="link_request" />
           <NavigationProperty Name="school" Relationship="Self.fk_user_school" FromRole="user" ToRole="school" />
           <NavigationProperty Name="user_share_file" Relationship="Self.fk_user_has_file1_user1" FromRole="user" ToRole="user_share_file" />
           <NavigationProperty Name="file" Relationship="fileModel.fk_file_user1" FromRole="user" ToRole="file" />
+          <NavigationProperty Name="answer" Relationship="fileModel.fk_answer_user1" FromRole="user" ToRole="answer" />
+          <NavigationProperty Name="file_request" Relationship="fileModel.fk_file_request_user1" FromRole="user" ToRole="file_request" />
         </EntityType>
         <EntityType Name="user_share_file">
           <Key>
@@ -262,20 +300,6 @@
             </Principal>
             <Dependent Role="user_share_file">
               <PropertyRef Name="file_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="fk_file_request_user1">
-          <End Role="user" Type="Self.user" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="file_request" Type="Self.file_request" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="user">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="file_request">
-              <PropertyRef Name="user_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -317,7 +341,6 @@
         </Association>
         <EntityContainer Name="FileEntitiesFinal" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="file" EntityType="Self.file" />
-          <EntitySet Name="file_request" EntityType="Self.file_request" />
           <EntitySet Name="link_request" EntityType="Self.link_request" />
           <EntitySet Name="school" EntityType="Self.school" />
           <EntitySet Name="user" EntityType="Self.user" />
@@ -325,10 +348,6 @@
           <AssociationSet Name="fk_user_has_file1_file1" Association="Self.fk_user_has_file1_file1">
             <End Role="file" EntitySet="file" />
             <End Role="user_share_file" EntitySet="user_share_file" />
-          </AssociationSet>
-          <AssociationSet Name="fk_file_request_user1" Association="Self.fk_file_request_user1">
-            <End Role="user" EntitySet="user" />
-            <End Role="file_request" EntitySet="file_request" />
           </AssociationSet>
           <AssociationSet Name="fk_request_user1" Association="Self.fk_request_user1">
             <End Role="user" EntitySet="user" />
@@ -346,7 +365,21 @@
             <End Role="user" EntitySet="user" />
             <End Role="file" EntitySet="file" />
           </AssociationSet>
-        </EntityContainer>
+          <EntitySet Name="answer" EntityType="fileModel.answer" />
+          <EntitySet Name="file_request" EntityType="fileModel.file_request" />
+          <AssociationSet Name="fk_answer_file_request1" Association="fileModel.fk_answer_file_request1">
+            <End Role="file_request" EntitySet="file_request" />
+            <End Role="answer" EntitySet="answer" />
+          </AssociationSet>
+          <AssociationSet Name="fk_answer_user1" Association="fileModel.fk_answer_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="answer" EntitySet="answer" />
+          </AssociationSet>
+          <AssociationSet Name="fk_file_request_user1" Association="fileModel.fk_file_request_user1">
+            <End Role="user" EntitySet="user" />
+            <End Role="file_request" EntitySet="file_request" />
+          </AssociationSet>
+          </EntityContainer>
         <Association Name="fk_file_user1">
           <End Type="fileModel.user" Role="user" Multiplicity="1" />
           <End Type="fileModel.file" Role="file" Multiplicity="*" />
@@ -359,7 +392,76 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        <EntityType Name="answer">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="file_request_id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="content" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="answer_time" Type="DateTime" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="file_request_id" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="file_request" Relationship="fileModel.fk_answer_file_request1" FromRole="answer" ToRole="file_request" />
+          <NavigationProperty Name="user" Relationship="fileModel.fk_answer_user1" FromRole="answer" ToRole="user" />
+        </EntityType>
+        <EntityType Name="file_request">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="title" Type="String" MaxLength="45" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="120" FixedLength="false" Unicode="false" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="post_time" Type="DateTime" />
+          <NavigationProperty Name="answer" Relationship="fileModel.fk_answer_file_request1" FromRole="file_request" ToRole="answer" />
+          <NavigationProperty Name="user" Relationship="fileModel.fk_file_request_user1" FromRole="file_request" ToRole="user" />
+        </EntityType>
+        <Association Name="fk_answer_file_request1">
+          <End Type="fileModel.file_request" Role="file_request" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="fileModel.answer" Role="answer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="file_request">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="answer">
+              <PropertyRef Name="file_request_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_answer_user1">
+          <End Type="fileModel.user" Role="user" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="fileModel.answer" Role="answer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="answer">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_file_request_user1">
+          <End Type="fileModel.user" Role="user" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="fileModel.file_request" Role="file_request" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="file_request">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -380,17 +482,6 @@
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="permission" ColumnName="permission" />
                 <ScalarProperty Name="status" ColumnName="status" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="file_request">
-            <EntityTypeMapping TypeName="fileModel.file_request">
-              <MappingFragment StoreEntitySet="file_request">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="filename" ColumnName="filename" />
-                <ScalarProperty Name="description" ColumnName="description" />
-                <ScalarProperty Name="status" ColumnName="status" />
-                <ScalarProperty Name="user_id" ColumnName="user_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -429,6 +520,29 @@
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="file_id" ColumnName="file_id" />
                 <ScalarProperty Name="code" ColumnName="code" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="answer">
+            <EntityTypeMapping TypeName="fileModel.answer">
+              <MappingFragment StoreEntitySet="answer">
+                <ScalarProperty Name="file_request_id" ColumnName="file_request_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="answer_time" ColumnName="answer_time" />
+                <ScalarProperty Name="content" ColumnName="content" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="file_request">
+            <EntityTypeMapping TypeName="fileModel.file_request">
+              <MappingFragment StoreEntitySet="file_request">
+                <ScalarProperty Name="post_time" ColumnName="post_time" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
