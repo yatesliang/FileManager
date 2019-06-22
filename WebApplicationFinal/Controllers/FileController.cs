@@ -85,11 +85,14 @@ namespace WebApplicationFinal.Controllers
                     //    userId = 2;
                     //}
                     String fileName = file.FileName;
+                    String storeFilename = fileName;
+
                     fileName = userId.ToString() + "_" + fileName;
                     // check whether the file name already exist, if yes, replace a name automatically
                     if (isFileNameExisted(fileName)) {
                         // TODO: call a function and get a new name here
                         fileName = fileName + "_" + 1.ToString();
+                        storeFilename = storeFilename + "_" + 1.ToString();
                     }
                     
                     // call the upload function here and get the return url
@@ -104,7 +107,7 @@ namespace WebApplicationFinal.Controllers
 
                     file newFile = new file()
                     {
-                        name = fileName,
+                        name = storeFilename,
                         user_id = (int)userId,
                         url = url, 
                         time = time,
@@ -119,6 +122,7 @@ namespace WebApplicationFinal.Controllers
                     // TODO： call the function to finished
                     Task task = StoreFileToDB(newFile);
                     task.Wait();
+                    addUpFileNumbs((int)userId);
                     filelist.Add("File \'"+file.FileName+"\' upload success");
                 }
             }
@@ -182,7 +186,9 @@ namespace WebApplicationFinal.Controllers
                     return "FileNotExist";
                 } else
                 {
+                    addUpDownloadTimes(tempFile.id);
                     return tempFile.url.ToString()+"?attname=";
+
                 }
             }
         }
@@ -214,7 +220,15 @@ namespace WebApplicationFinal.Controllers
             }
             //TODO: get the download path
             Download download = new Download();
-            string path = download.singleThreadDownload(targetFile.url, targetFile.name);
+            string path = "";
+            if (targetFile.size > 20 * 1024)
+            {
+                path = download.multiThreadDownload(targetFile.url, targetFile.name);
+            } else
+            {
+                path = download.singleThreadDownload(targetFile.url, targetFile.name);
+
+            }
             if (path == "")
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Fail to download");
@@ -233,6 +247,7 @@ namespace WebApplicationFinal.Controllers
                 };
                 response.Headers.Add("Access-Control-Expose-Header", "FileName");
                 response.Headers.Add("FileName", HttpUtility.UrlEncode(fileName));
+                addUpDownloadTimes(targetFile.id);
             }
             catch (Exception e)
             {
@@ -585,7 +600,53 @@ namespace WebApplicationFinal.Controllers
                     }
                 }
                 return stringBuilder.ToString();
+         }
+
+        private async void addUpDownloadTimes(int fileId)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+                 using (FileEntitiesFinal entity = new FileEntitiesFinal())
+                 {
+                    file tempFile = entity.file.Where(f => f.id == fileId).FirstOrDefault();
+                    if (tempFile == null)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        tempFile.download_times++;
+                        entity.file.Attach(tempFile);
+                        entity.Entry(tempFile).State = System.Data.Entity.EntityState.Modified;
+                        await entity.SaveChangesAsync();
+                    }
+                 }
+                scope.Complete();
+                
             }
+             
+        }
+
+        private async void addUpFileNumbs(int userId)
+        {
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (FileEntitiesFinal entity = new FileEntitiesFinal())
+                {
+                    user tempUser = entity.user.Where(u => u.id == userId).FirstOrDefault();
+                    if (tempUser == null)
+                    {
+                        return;
+
+                    }
+                    tempUser.file_nums++;
+                    entity.user.Attach(tempUser);
+                    entity.Entry(tempUser).State = System.Data.Entity.EntityState.Modified;
+                    await entity.SaveChangesAsync();
+                }
+            }
+            
+        }
         
 
 
