@@ -19,6 +19,7 @@ using System.Text;
 using WebApplicationFinal.Util;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using RandomCodeLib;
 
 namespace WebApplicationFinal.Controllers
 {
@@ -540,12 +541,13 @@ namespace WebApplicationFinal.Controllers
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound, "No such file");
                 }
+                RandomCodeLib.CodeClass codeClass = new CodeClass();
                 if (user_Share_File == null)
                 {
-                    code = GetRandomString(6);
+                    codeClass.getRandomCode(6, out code);
                     while (isCodeExist(code))
                     {
-                        code = GetRandomString(6);
+                        codeClass.getRandomCode(6, out code);
                         if (code.Length < 6)
                         {
                             return Request.CreateResponse(HttpStatusCode.InternalServerError, "File to get the code");
@@ -574,33 +576,33 @@ namespace WebApplicationFinal.Controllers
             }
         }
 
-        private string GetRandomString(int length)
-        {
-            const string key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-            if (length < 1)
-            {
-                return string.Empty;
-            }
-                Random random = new Random();
-                byte[] buffer = new byte[8];
-                ulong bit = 21;
-                ulong result = 0;
-                int index = 0;
-                StringBuilder stringBuilder = new StringBuilder((length / 5 + 1) * 5);
-                while (stringBuilder.Length <length)
-                {
-                    random.NextBytes(buffer);
-                    buffer[5] = buffer[6] = buffer[7] = 0x00;
-                    result = BitConverter.ToUInt64(buffer, 0);
-                    while (result >0 && stringBuilder.Length <length)
-                    {
-                        index = (int)(bit & result);
-                        stringBuilder.Append(key[index]);
-                        result = result >> 5;
-                    }
-                }
-                return stringBuilder.ToString();
-         }
+        //private string GetRandomString(int length)
+        //{
+        //    const string key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        //    if (length < 1)
+        //    {
+        //        return string.Empty;
+        //    }
+        //        Random random = new Random();
+        //        byte[] buffer = new byte[8];
+        //        ulong bit = 21;
+        //        ulong result = 0;
+        //        int index = 0;
+        //        StringBuilder stringBuilder = new StringBuilder((length / 5 + 1) * 5);
+        //        while (stringBuilder.Length <length)
+        //        {
+        //            random.NextBytes(buffer);
+        //            buffer[5] = buffer[6] = buffer[7] = 0x00;
+        //            result = BitConverter.ToUInt64(buffer, 0);
+        //            while (result >0 && stringBuilder.Length <length)
+        //            {
+        //                index = (int)(bit & result);
+        //                stringBuilder.Append(key[index]);
+        //                result = result >> 5;
+        //            }
+        //        }
+        //        return stringBuilder.ToString();
+        // }
 
         private async void addUpDownloadTimes(int fileId)
         {
