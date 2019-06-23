@@ -15,7 +15,7 @@ namespace WebApplicationFinal
 
             // Web API 路由
             config.MapHttpAttributeRoutes();
-            config.EnableCors(new EnableCorsAttribute(origins: "http://localhost:63342", headers: "*", methods: "*") { SupportsCredentials = true });
+            config.EnableCors(new EnableCorsAttribute(origins: "http://localhost:12345", headers: "*", methods: "*") { SupportsCredentials = true });
 
 
 
