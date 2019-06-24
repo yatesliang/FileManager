@@ -20,6 +20,7 @@ using WebApplicationFinal.Util;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using RandomCodeLib;
+using CheckFile;
 
 namespace WebApplicationFinal.Controllers
 {
@@ -28,10 +29,10 @@ namespace WebApplicationFinal.Controllers
     public class FileController : ApiController
     {
 
-        [DllImport(@"C:\Users\wrl\Desktop\NET\DLL\FileCheck.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int checkName(string name, ref byte info);
-        [DllImport(@"C:\Users\wrl\Desktop\NET\DLL\FileCheck.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int getFileType(string name);
+        //[DllImport("FileCheck.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        //public static extern int checkName(string name, ref byte info);
+        //[DllImport("FileCheck.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        //public static extern int getFileType(string name);
 
 
         [HttpPost]
@@ -49,7 +50,9 @@ namespace WebApplicationFinal.Controllers
 
                     // check file name here
                     byte[] info = new byte[1024];
-                    if (checkName(file.FileName, ref info[0]) == -1)
+                    CheckFiles check = new CheckFiles();
+                    
+                    if (check.checkName(file.FileName) != "OK")
                     {
                         filelist.Add("File \'" + file.FileName + "\' name is not valid");
                         continue;
@@ -64,7 +67,7 @@ namespace WebApplicationFinal.Controllers
                     }
                     catch(Exception e)
                     {
-                        type = getFileType(file.FileName).ToString();
+                        type = check.getFileType(file.FileName).ToString();
                     }
 
 
@@ -341,7 +344,7 @@ namespace WebApplicationFinal.Controllers
             }
             FileEntitiesFinal entity = new FileEntitiesFinal();
 
-            var fileList = from f in entity.file where f.user_id == (int)userId && f.status == 1 select new { f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
+            var fileList = from f in entity.file where f.user_id == (int)userId && f.status == 1 orderby f.time descending select new {f.time, f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
 
             List<dynamic> result = new List<dynamic>();
             foreach (var line in fileList)
@@ -363,7 +366,7 @@ namespace WebApplicationFinal.Controllers
            
             using (FileEntitiesFinal entity = new FileEntitiesFinal())
             {
-                var fileList = from f in entity.file where f.permission!=2 && f.status == 1 select new { f.name, f.id, f.download_times, f.description, f.size ,f.permission, f.type, f.user_share_file.FirstOrDefault().code};
+                var fileList = from f in entity.file where f.permission!=2 && f.status == 1 select new { f.time, f.name, f.id, f.download_times, f.description, f.size ,f.permission, f.type, f.user_share_file.FirstOrDefault().code};
 
                 List<dynamic> result = new List<dynamic>();
                 foreach (var line in fileList)
@@ -390,7 +393,7 @@ namespace WebApplicationFinal.Controllers
         {
             using (FileEntitiesFinal entity = new FileEntitiesFinal())
             {
-                var fileList = from f in entity.file where f.type == type && f.status == 1 select new { f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
+                var fileList = from f in entity.file where f.type == type && f.status == 1 select new { f.time, f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
 
                 List<dynamic> result = new List<dynamic>();
                 foreach (var line in fileList)
@@ -414,7 +417,7 @@ namespace WebApplicationFinal.Controllers
             var userId = HttpContext.Current.Session["id"];
             using (FileEntitiesFinal entity = new FileEntitiesFinal())
             {
-                var fileList = from f in entity.file where f.user_id == (int)userId && f.type == type && f.status == 1 select new { f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
+                var fileList = from f in entity.file where f.user_id == (int)userId && f.type == type && f.status == 1 select new { f.time, f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
 
                 List<dynamic> result = new List<dynamic>();
                 foreach (var line in fileList)
@@ -438,7 +441,7 @@ namespace WebApplicationFinal.Controllers
         {
             using (FileEntitiesFinal entity = new FileEntitiesFinal())
             {
-                var fileList = from f in entity.file where f.name.Contains(key) && f.status == 1 select new { f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
+                var fileList = from f in entity.file where f.name.Contains(key) && f.status == 1 select new { f.time, f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
 
                 List<dynamic> result = new List<dynamic>();
                 foreach (var line in fileList)
@@ -462,7 +465,7 @@ namespace WebApplicationFinal.Controllers
             var userId = HttpContext.Current.Session["id"];
             using (FileEntitiesFinal entity = new FileEntitiesFinal())
             {
-                var fileList = from f in entity.file where f.name.Contains(key) && f.status == 1 && f.user_id == (int)userId select new { f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
+                var fileList = from f in entity.file where f.name.Contains(key) && f.status == 1 && f.user_id == (int)userId select new { f.time, f.name, f.id, f.download_times, f.description, f.size, f.permission, f.type, f.user_share_file.FirstOrDefault().code };
 
                 List<dynamic> result = new List<dynamic>();
                 foreach (var line in fileList)

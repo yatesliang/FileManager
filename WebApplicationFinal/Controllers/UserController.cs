@@ -27,7 +27,7 @@ namespace WebApplicationFinal.Controllers
     [UserFilter]
     public class UserController : ApiController
     {
-        [DllImport(@"C:\Users\wrl\Desktop\NET\DLL\Encrypt.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"Encrypt.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
         public static extern int getEncodeString(string s, ref byte result);
 
         FileEntitiesFinal db = new FileEntitiesFinal();
